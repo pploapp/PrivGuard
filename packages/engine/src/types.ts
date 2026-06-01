@@ -46,10 +46,12 @@ export class DsrRequest {
   }
 
   isOverdue(): boolean {
+    if (!this.deadlineAt) return false;
     return new Date(this.deadlineAt) < new Date();
   }
 
   daysUntilDeadline(): number {
+    if (!this.deadlineAt) return 0;
     const diff = new Date(this.deadlineAt).getTime() - Date.now();
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   }

@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  privguard-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PRIVGUARD_DB_PATH=/data/privguard-api.sqlite
+      - PORT=3001
+    volumes:
+      - privguard-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  privguard-portal:
+    build:
+      context: .
+      dockerfile: Dockerfile.portal
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://privguard-api:3001
+    depends_on:
+      privguard-api:
+        condition: service_healthy
+
+volumes:
+  privguard-data:
